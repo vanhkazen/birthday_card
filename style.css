@@ -1,0 +1,658 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+:root {
+  --font: "Be Vietnam Pro", system-ui, sans-serif;
+  --mono: "JetBrains Mono", monospace;
+  --hand: "Mali", cursive;
+
+  --cyan: #00fff2;
+  --pink: #ff2a85;
+  --gold: #ffcc00;
+
+  --bg1: #060811;
+  --bg2: #0f172a;
+
+  --glass: rgba(255, 255, 255, 0.06);
+  --border: rgba(255, 255, 255, 0.12);
+  --text: rgba(255, 255, 255, 0.95);
+  --muted: rgba(255, 255, 255, 0.72);
+}
+
+html,
+body {
+  height: 100%;
+}
+
+body {
+  font-family: var(--font);
+  color: var(--text);
+  background:
+    radial-gradient(650px 450px at 15% 20%, rgba(0, 255, 242, 0.12), transparent 60%),
+    radial-gradient(650px 450px at 85% 25%, rgba(255, 42, 133, 0.12), transparent 60%),
+    radial-gradient(700px 500px at 50% 90%, rgba(255, 204, 0, 0.08), transparent 65%),
+    linear-gradient(135deg, var(--bg1), var(--bg2));
+  overflow-x: hidden;
+  position: relative;
+}
+
+/* Hiệu ứng hạt sao lấp lánh trên nền */
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(2px 2px at 15% 25%, rgba(255, 255, 255, 0.45), transparent),
+    radial-gradient(2px 2px at 45% 75%, rgba(0, 255, 242, 0.45), transparent),
+    radial-gradient(2px 2px at 75% 35%, rgba(255, 42, 133, 0.45), transparent),
+    radial-gradient(2px 2px at 85% 85%, rgba(255, 204, 0, 0.45), transparent);
+  background-size: 550px 550px;
+  animation: twinkle 8s ease-in-out infinite alternate;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes twinkle {
+  from {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+
+  to {
+    opacity: 0.85;
+    transform: translateY(-10px);
+  }
+}
+
+#confettiCanvas {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 99;
+}
+
+/* Nút bật/tắt nhạc nền */
+.musicToggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 100;
+  background: rgba(0, 0, 0, 0.45);
+  border: 1px solid rgba(0, 255, 242, 0.3);
+  padding: 8px 14px;
+  border-radius: 999px;
+  color: var(--text);
+  font-family: var(--mono);
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  backdrop-filter: blur(10px);
+  transition: all 0.2s;
+}
+
+.musicToggle:hover {
+  border-color: var(--cyan);
+  box-shadow: 0 0 12px rgba(0, 255, 242, 0.35);
+}
+
+.musicToggle.playing {
+  border-color: var(--pink);
+  box-shadow: 0 0 12px rgba(255, 42, 133, 0.45);
+}
+
+.stage {
+  min-height: 100%;
+  display: grid;
+  place-items: center;
+  padding: 24px 16px;
+  position: relative;
+  z-index: 2;
+}
+
+.cardContainer {
+  width: min(560px, 100%);
+  min-height: 580px;
+  position: relative;
+  border-radius: 28px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.09), rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border);
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.6), inset 0 0 0 1px rgba(0, 255, 242, 0.08);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  padding: 32px 26px 64px;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  align-items: center;
+  overflow: hidden;
+}
+
+/* ================= CƠ CHẾ FADE IN - OUT 3 MÀN HÌNH ================= */
+.screen {
+  grid-area: 1 / 1;
+  width: 100%;
+  min-width: 0;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(14px) scale(0.97);
+  transition: opacity 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+    visibility 0.45s;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.screen.active {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) scale(1);
+  pointer-events: auto;
+}
+
+/* ================= TYPOGRAPHY & BADGES ================= */
+.badge {
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 800;
+  letter-spacing: 1.2px;
+  padding: 7px 14px;
+  border-radius: 999px;
+  background: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(0, 255, 242, 0.25);
+  color: var(--cyan);
+  margin-bottom: 14px;
+}
+
+.heading {
+  font-size: clamp(22px, 4vw, 29px);
+  font-weight: 900;
+  margin-bottom: 10px;
+}
+
+.desc {
+  color: var(--muted);
+  font-size: 14.5px;
+  line-height: 1.6;
+  max-width: 44ch;
+  margin-bottom: 22px;
+}
+
+/* ================= MÀN 1: BÁNH KEM & NGỌN LỬA VẼ BẰNG CODE ================= */
+.cakeBox {
+  position: relative;
+  width: 180px;
+  height: 190px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  margin: 6px 0 26px;
+  cursor: pointer;
+  transition: transform 0.25s ease;
+}
+
+.cakeBox:hover {
+  transform: scale(1.04);
+}
+
+.candle {
+  width: 18px;
+  height: 52px;
+  background: repeating-linear-gradient(45deg, #fff, #fff 6px, var(--pink) 6px, var(--pink) 12px);
+  border-radius: 4px 4px 0 0;
+  position: relative;
+  z-index: 3;
+  box-shadow: 0 0 12px rgba(255, 42, 133, 0.3);
+}
+
+.wick {
+  width: 3px;
+  height: 8px;
+  background: #333;
+  position: absolute;
+  top: -8px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.flame {
+  width: 24px;
+  height: 24px;
+  background: radial-gradient(circle at 30% 70%, #fff, var(--gold) 45%, #ff5500 85%);
+  border-radius: 50% 0 50% 50%;
+  transform: translateX(-50%) rotate(-45deg);
+  position: absolute;
+  top: -32px;
+  left: 50%;
+  box-shadow: 0 0 22px 6px rgba(255, 180, 0, 0.55), 0 0 45px 12px rgba(255, 80, 0, 0.35);
+  animation: flicker 1.2s ease-in-out infinite alternate;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.flame.off {
+  opacity: 0;
+  transform: translateX(-50%) rotate(-45deg) scale(0.1);
+}
+
+@keyframes flicker {
+  0% {
+    transform: translateX(-50%) rotate(-45deg) scale(1);
+  }
+
+  50% {
+    transform: translateX(-50%) rotate(-42deg) scale(1.08, 0.95);
+  }
+
+  100% {
+    transform: translateX(-50%) rotate(-47deg) scale(0.96, 1.06);
+  }
+}
+
+.smoke {
+  position: absolute;
+  top: -28px;
+  left: 50%;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: rgba(200, 220, 255, 0.45);
+  filter: blur(4px);
+  opacity: 0;
+  pointer-events: none;
+}
+
+.smoke.rise {
+  animation: smokeUp 1.2s ease-out forwards;
+}
+
+@keyframes smokeUp {
+  0% {
+    opacity: 0.8;
+    transform: translate(-50%, 0) scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -45px) scale(3.2);
+  }
+}
+
+.cake {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cake__icing {
+  width: 136px;
+  height: 22px;
+  background: linear-gradient(90deg, var(--cyan), #7b61ff, var(--pink));
+  border-radius: 14px 14px 6px 6px;
+  box-shadow: 0 4px 14px rgba(0, 255, 242, 0.25);
+  z-index: 2;
+}
+
+.cake__layer {
+  width: 130px;
+  height: 64px;
+  background: linear-gradient(180deg, #1e293b, #0f172a);
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  border-top: none;
+  border-radius: 0 0 12px 12px;
+}
+
+.cake__plate {
+  width: 164px;
+  height: 8px;
+  background: rgba(255, 255, 255, 0.22);
+  border-radius: 999px;
+  margin-top: 2px;
+}
+
+/* ================= MÀN 2: KHUNG AVATAR VẼ BẰNG CODE ================= */
+.avatarWrap {
+  margin: 4px 0 14px;
+}
+
+.codeFrame {
+  width: 150px;
+  height: 150px;
+  position: relative;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+}
+
+.codeFrame::before {
+  content: "";
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, var(--cyan), var(--pink), var(--gold), var(--cyan));
+  animation: spinSlow 6s linear infinite;
+  filter: blur(6px);
+  opacity: 0.78;
+}
+
+.codeFrame__svg {
+  position: absolute;
+  inset: -8px;
+  width: calc(100% + 16px);
+  height: calc(100% + 16px);
+  animation: spinSlow 14s linear infinite reverse;
+  pointer-events: none;
+}
+
+@keyframes spinSlow {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.avatarImg {
+  width: 134px;
+  height: 134px;
+  border-radius: 50%;
+  object-fit: cover;
+  object-position: 50% 35%;
+  border: 3px solid #0b1325;
+  position: relative;
+  z-index: 2;
+}
+
+.levelBadge {
+  position: absolute;
+  bottom: -4px;
+  z-index: 3;
+  font-family: var(--mono);
+  font-size: 10.5px;
+  font-weight: 800;
+  padding: 4px 11px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--pink), #ff758c);
+  color: #fff;
+  box-shadow: 0 4px 12px rgba(255, 42, 133, 0.45);
+}
+
+.profileName {
+  font-size: 24px;
+  font-weight: 900;
+  margin-top: 4px;
+}
+
+.profileQuote {
+  font-family: var(--hand);
+  font-size: 14.5px;
+  color: var(--cyan);
+  margin: 6px 0 16px;
+}
+
+.timeLabel {
+  font-size: 12.5px;
+  color: var(--muted);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+
+.countdown {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  width: 100%;
+  margin-bottom: 22px;
+}
+
+.cdItem {
+  background: var(--glass);
+  border: 1px solid rgba(0, 255, 242, 0.18);
+  border-radius: 12px;
+  padding: 10px 6px;
+}
+
+.cdItem span {
+  display: block;
+  font-family: var(--mono);
+  font-size: 17px;
+  font-weight: 800;
+  color: var(--cyan);
+}
+
+.cdItem small {
+  font-size: 11px;
+  color: var(--muted);
+}
+
+/* ================= MÀN 3: TÂM THƯ & DÂY CHUYỀN ẢNH BUFFET ================= */
+.letterBox {
+  width: 100%;
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid rgba(0, 255, 242, 0.22);
+  border-radius: 18px;
+  padding: 14px 16px;
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+.letterText {
+  font-family: var(--hand);
+  font-size: 14px;
+  line-height: 1.62;
+  color: var(--text);
+  min-height: 76px;
+}
+
+.letterSign {
+  margin-top: 8px;
+  text-align: right;
+  font-family: var(--mono);
+  font-size: 11.5px;
+  font-weight: 700;
+  color: var(--cyan);
+}
+
+.marqueeWrap {
+  width: 100%;
+  max-width: 100%;
+  margin: 2px 0 18px;
+  overflow: hidden;
+  position: relative;
+  padding: 10px 0;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 10%, #000 90%, transparent);
+}
+
+.marqueeTrack {
+  display: flex;
+  gap: 14px;
+  width: max-content;
+  animation: scrollBuffet 9s linear infinite;
+}
+
+.marqueeWrap:hover .marqueeTrack,
+.marqueeWrap:active .marqueeTrack {
+  animation-play-state: paused;
+}
+
+@keyframes scrollBuffet {
+  0% {
+    transform: translateX(0);
+  }
+
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.polaroid {
+  width: 118px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 14px;
+  padding: 7px 7px 10px;
+  backdrop-filter: blur(8px);
+  flex-shrink: 0;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1), border-color 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+}
+
+.polaroid:nth-child(even) {
+  transform: rotate(2deg);
+}
+
+.polaroid:nth-child(odd) {
+  transform: rotate(-2deg);
+}
+
+.polaroid:hover {
+  transform: translateY(-5px) scale(1.06) rotate(0deg);
+  border-color: var(--cyan);
+  box-shadow: 0 10px 24px rgba(0, 255, 242, 0.28);
+  z-index: 5;
+}
+
+.polaroid__img {
+  width: 100%;
+  height: 104px;
+  object-fit: cover;
+  border-radius: 9px;
+  display: block;
+  background: #0b1325;
+}
+
+.polaroid__cap {
+  font-family: var(--hand);
+  font-size: 11px;
+  color: var(--text);
+  margin-top: 6px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ================= HỘP PHÓNG TO ẢNH (LIGHTBOX) ================= */
+.lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(5, 7, 13, 0.85);
+  backdrop-filter: blur(10px);
+  z-index: 150;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s, visibility 0.3s;
+  cursor: zoom-out;
+}
+
+.lightbox.open {
+  opacity: 1;
+  visibility: visible;
+}
+
+.lightbox__content {
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(0, 255, 242, 0.35);
+  border-radius: 20px;
+  padding: 12px 12px 16px;
+  max-width: min(360px, 90vw);
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+  transform: scale(0.92);
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.lightbox.open .lightbox__content {
+  transform: scale(1);
+}
+
+.lightbox__img {
+  width: 100%;
+  max-height: 60vh;
+  object-fit: cover;
+  border-radius: 12px;
+  display: block;
+}
+
+.lightbox__cap {
+  font-family: var(--hand);
+  font-size: 15px;
+  color: var(--cyan);
+  margin-top: 10px;
+}
+
+/* ================= BUTTONS & DOTS ================= */
+.navRow {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.btnPrimary,
+.btnGhost {
+  font-family: var(--font);
+  font-size: 13.5px;
+  font-weight: 700;
+  padding: 11px 18px;
+  border-radius: 12px;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s, background 0.2s;
+}
+
+.btnPrimary {
+  border: none;
+  background: linear-gradient(90deg, var(--cyan), #00c3ff);
+  color: #03121c;
+  box-shadow: 0 6px 20px rgba(0, 255, 242, 0.28);
+}
+
+.btnPrimary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 26px rgba(0, 255, 242, 0.45);
+}
+
+.btnGhost {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+  border: 1px solid var(--border);
+}
+
+.btnGhost:hover {
+  background: rgba(255, 255, 255, 0.12);
+}
+
+.stepDots {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 8px;
+}
+
+.dotBtn {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  border: none;
+  background: rgba(255, 255, 255, 0.22);
+  cursor: pointer;
+  transition: width 0.3s, background 0.3s;
+}
+
+.dotBtn.active {
+  width: 28px;
+  background: var(--cyan);
+  box-shadow: 0 0 10px var(--cyan);
+}

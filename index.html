@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="vi">
+
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Happy Birthday | Món quà nhỏ dành tặng bạn ✨</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;600;700;900&family=JetBrains+Mono:wght@600;800&family=Mali:ital,wght@0,600;1,600&display=swap"
+    rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- Canvas bắn pháo giấy chúc mừng -->
+  <canvas id="confettiCanvas"></canvas>
+
+  <!-- Nhạc nền tự động phát khi thổi nến -->
+  <audio id="bgMusic" loop>
+    <source src="./assets/snaptik.vn_7687991911730154772.mp3" type="audio/mpeg">
+  </audio>
+
+  <!-- Nút bật/tắt nhạc góc trên bên phải -->
+  <button class="musicToggle" id="musicToggleBtn" title="Bật/Tắt nhạc nền">
+    <span class="musicIcon">🎵</span>
+    <span class="musicText">Bật nhạc</span>
+  </button>
+
+  <main class="stage">
+    <div class="cardContainer">
+
+      <!-- ================= MÀN 1: THỔI NẾN ƯỚC NGUYỆN ================= -->
+      <section class="screen active" id="screen-1">
+        <div class="badge">SPECIAL GIFT FOR YOU • 🎂</div>
+        <h1 class="heading">Hôm nay là ngày của bạn! ✨</h1>
+        <p class="desc">
+          Mình có chuẩn bị một chiếc bánh nhỏ ở đây. Hãy nhắm mắt ước một điều thật đẹp cho tuổi mới rồi chạm vào ngọn
+          nến để thổi tắt nhé!
+        </p>
+
+        <!-- Bánh kem & Ngọn lửa vẽ 100% bằng CSS -->
+        <div class="cakeBox" id="blowBtn" title="Chạm để thổi nến">
+          <div class="candle">
+            <div class="flame" id="flame"></div>
+            <div class="smoke" id="smoke"></div>
+            <div class="wick"></div>
+          </div>
+          <div class="cake">
+            <div class="cake__icing"></div>
+            <div class="cake__layer"></div>
+            <div class="cake__plate"></div>
+          </div>
+        </div>
+
+        <button class="btnPrimary" id="actionBlow">💨 Chạm để thổi nến & Mở thiệp</button>
+      </section>
+
+      <!-- ================= MÀN 2: PROFILE & ĐẾM THỜI GIAN ================= -->
+      <section class="screen" id="screen-2">
+        <div class="badge">HAPPY BIRTHDAY TO YOU</div>
+
+        <!-- Khung Avatar vẽ bằng CSS + SVG -->
+        <div class="avatarWrap">
+          <div class="codeFrame">
+            <svg class="codeFrame__svg" viewBox="0 0 200 200">
+              <circle cx="100" cy="100" r="94" fill="none" stroke="url(#grad)" stroke-width="2.2"
+                stroke-dasharray="16 8 4 8" />
+              <defs>
+                <linearGradient id="grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                  <stop offset="0%" stop-color="#00fff2" />
+                  <stop offset="50%" stop-color="#ff2a85" />
+                  <stop offset="100%" stop-color="#ffcc00" />
+                </linearGradient>
+              </defs>
+            </svg>
+            <img class="avatarImg" src="./assets/avatar.jpg" alt="Birthday Star">
+            <span class="levelBadge" id="recipientTag">✨ SHINING STAR ✨</span>
+          </div>
+        </div>
+
+        <h2 class="profileName" id="recipientName">Người Đặc Biệt</h2>
+        <p class="profileQuote">“Cảm ơn vì bạn đã đến và làm thế giới này rực rỡ hơn.”</p>
+
+        <div class="timeLabel">Hành trình bạn tỏa sáng trên thế giới này:</div>
+        <div class="countdown">
+          <div class="cdItem"><span id="alive-days">0000</span><small>Ngày</small></div>
+          <div class="cdItem"><span id="alive-hours">00</span><small>Giờ</small></div>
+          <div class="cdItem"><span id="alive-mins">00</span><small>Phút</small></div>
+          <div class="cdItem"><span id="alive-secs">00</span><small>Giây</small></div>
+        </div>
+
+        <div class="navRow">
+          <button class="btnGhost" data-target="1">← Thắp lại nến</button>
+          <button class="btnPrimary" data-target="3">Đọc lời chúc của mình →</button>
+        </div>
+      </section>
+
+      <!-- ================= MÀN 3: LỜI CHÚC & BĂNG CHUYỀN ẢNH BUFFET ================= -->
+      <section class="screen" id="screen-3">
+        <div class="badge">MEMORIES & WISHES • 📸</div>
+        <h2 class="heading">Khoảnh khắc & Lời chúc ✨</h2>
+
+        <div class="letterBox">
+          <p class="letterText" id="typewriterText"></p>
+          <div class="letterSign" id="senderSign">— From Vanh with luv 🤍</div>
+        </div>
+
+        <!-- Dây chuyền ảnh chạy ngang vô tận (Buffet Conveyor) -->
+        <div class="marqueeWrap" title="Chạm vào ảnh để dừng lại ngắm hoặc xem phóng to!">
+          <div class="marqueeTrack" id="photoTrack">
+            <!-- JS sẽ tự động tạo danh sách ảnh Polaroid chạy vòng lặp tại đây -->
+          </div>
+        </div>
+
+        <div class="navRow">
+          <button class="btnGhost" data-target="2">← Quay lại</button>
+          <button class="btnPrimary" id="fireworkBtn">🎉 Bắn pháo hoa chúc mừng!</button>
+        </div>
+      </section>
+
+      <!-- Thanh chấm chuyển màn hình (Navigation Dots) -->
+      <div class="stepDots">
+        <button class="dotBtn active" data-target="1" aria-label="Màn 1"></button>
+        <button class="dotBtn" data-target="2" aria-label="Màn 2"></button>
+        <button class="dotBtn" data-target="3" aria-label="Màn 3"></button>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- Hộp thoại phóng to ảnh (Lightbox) khi bấm vào ảnh trên băng chuyền -->
+  <div class="lightbox" id="lightbox">
+    <div class="lightbox__content">
+      <img class="lightbox__img" id="lightboxImg" src="" alt="Preview">
+      <div class="lightbox__cap" id="lightboxCap"></div>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+
+</html>
