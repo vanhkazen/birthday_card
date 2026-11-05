@@ -11,7 +11,6 @@
 - [Chạy trên máy cá nhân](#chạy-trên-máy-cá-nhân)
 - [Xuất bản](#xuất-bản)
 - [Hướng dẫn kiểm tra](#hướng-dẫn-kiểm-tra)
-- [Hồ sơ và minh chứng](#hồ-sơ-và-minh-chứng)
 - [Tác giả](#tác-giả)
 
 ## Thông tin sản phẩm
